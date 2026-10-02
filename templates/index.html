@@ -1,0 +1,2707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PC Diagnostic AI</title>
+
+    <style>
+
+        /* =========================================================
+           RESET + VARIABLES
+        ========================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #eef2f7;
+            --surface: #ffffff;
+            --surface-2: #f7f9fc;
+
+            --navy: #101a2b;
+            --navy-2: #17243a;
+
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --blue-soft: #e8f0ff;
+
+            --green: #0f9f6e;
+            --green-soft: #e7f8f1;
+
+            --orange: #e58b25;
+            --orange-soft: #fff3df;
+
+            --red: #dc4c4c;
+            --red-soft: #ffeded;
+
+            --text: #172033;
+            --muted: #687386;
+            --border: #dce2eb;
+
+            --shadow:
+                0 12px 35px rgba(16, 26, 43, 0.08);
+
+            --radius: 16px;
+        }
+
+
+        /* =========================================================
+           BODY
+        ========================================================= */
+
+        body {
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 10% 0%,
+                    rgba(37, 99, 235, 0.07),
+                    transparent 28%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+
+        /* =========================================================
+           APP SHELL
+        ========================================================= */
+
+        .app {
+            min-height: 100vh;
+
+            display: grid;
+
+            grid-template-columns: 250px 1fr;
+        }
+
+
+        /* =========================================================
+           SIDEBAR
+        ========================================================= */
+
+        .sidebar {
+            background: var(--navy);
+            color: white;
+
+            padding: 28px 20px;
+
+            position: sticky;
+            top: 0;
+
+            height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 0 8px 30px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.10);
+        }
+
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #3b82f6,
+                    #1d4ed8
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 21px;
+
+            box-shadow:
+                0 8px 20px rgba(37,99,235,.25);
+        }
+
+
+        .brand-name {
+            font-size: 15px;
+            font-weight: 700;
+
+            letter-spacing: .01em;
+        }
+
+
+        .brand-sub {
+            font-size: 11px;
+
+            color: #93a2b8;
+
+            margin-top: 2px;
+        }
+
+
+        /* Sidebar navigation */
+
+        .nav {
+            margin-top: 30px;
+        }
+
+
+        .nav-title {
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .15em;
+
+            color: #72819a;
+
+            padding: 0 10px 10px;
+        }
+
+
+        .nav-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            width: 100%;
+
+            padding: 11px 12px;
+
+            margin-bottom: 5px;
+
+            border-radius: 9px;
+
+            color: #aeb9ca;
+
+            font-size: 13px;
+        }
+
+
+        .nav-item.active {
+            background: rgba(59,130,246,.16);
+
+            color: white;
+        }
+
+
+        .nav-icon {
+            width: 20px;
+
+            text-align: center;
+
+            font-size: 15px;
+        }
+
+
+        /* Sidebar bottom */
+
+        .sidebar-bottom {
+            margin-top: auto;
+
+            padding: 15px 10px;
+
+            border-top: 1px solid rgba(255,255,255,.10);
+        }
+
+
+        .system-status {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 11px;
+
+            color: #9eabbd;
+        }
+
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            background: #35c98a;
+
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 0 4px rgba(53,201,138,.10);
+        }
+
+
+        /* =========================================================
+           MAIN CONTENT
+        ========================================================= */
+
+        .main {
+            min-width: 0;
+
+            padding: 28px 34px 50px;
+        }
+
+
+        .main-inner {
+            max-width: 1180px;
+
+            margin: auto;
+        }
+
+
+        /* =========================================================
+           TOP BAR
+        ========================================================= */
+
+        .topbar {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 28px;
+        }
+
+
+        .page-title h1 {
+            font-size: 25px;
+
+            font-weight: 750;
+
+            letter-spacing: -.03em;
+        }
+
+
+        .page-title p {
+            color: var(--muted);
+
+            font-size: 13px;
+
+            margin-top: 4px;
+        }
+
+
+        .top-status {
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 9px 13px;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+
+            border-radius: 30px;
+
+            box-shadow: 0 3px 10px rgba(16,26,43,.04);
+
+            font-size: 12px;
+
+            color: var(--muted);
+        }
+
+
+        .top-status .status-dot {
+            width: 7px;
+            height: 7px;
+        }
+
+
+        /* =========================================================
+           HERO
+        ========================================================= */
+
+        .hero {
+            background:
+                linear-gradient(
+                    120deg,
+                    #111d31,
+                    #1b2d4b
+                );
+
+            color: white;
+
+            border-radius: 20px;
+
+            padding: 30px 32px;
+
+            margin-bottom: 24px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 260px;
+            height: 260px;
+
+            border-radius: 50%;
+
+            background: rgba(59,130,246,.12);
+
+            right: -80px;
+            top: -110px;
+        }
+
+
+        .hero-content {
+            position: relative;
+
+            z-index: 1;
+
+            max-width: 720px;
+        }
+
+
+        .hero-label {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            color: #8db8ff;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: .12em;
+
+            margin-bottom: 10px;
+        }
+
+
+        .hero h2 {
+            font-size: clamp(25px, 3vw, 36px);
+
+            line-height: 1.1;
+
+            letter-spacing: -.04em;
+
+            margin-bottom: 10px;
+        }
+
+
+        .hero p {
+            color: #b9c5d8;
+
+            font-size: 13px;
+
+            max-width: 650px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =========================================================
+           DASHBOARD GRID
+        ========================================================= */
+
+        .dashboard-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.5fr)
+                minmax(280px, .8fr);
+
+            gap: 22px;
+
+            align-items: start;
+        }
+
+
+        /* =========================================================
+           CARD
+        ========================================================= */
+
+        .card {
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+
+            border-radius: var(--radius);
+
+            box-shadow: 0 5px 20px rgba(16,26,43,.04);
+        }
+
+
+        .card-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 20px 22px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+
+        .card-title {
+            font-size: 15px;
+
+            font-weight: 700;
+        }
+
+
+        .card-subtitle {
+            font-size: 11px;
+
+            color: var(--muted);
+
+            margin-top: 3px;
+        }
+
+
+        /* =========================================================
+           PROBLEM SELECTION
+        ========================================================= */
+
+        .problem-card {
+            overflow: hidden;
+        }
+
+
+        .problem-content {
+            padding: 20px;
+        }
+
+
+        .category {
+            margin-bottom: 22px;
+        }
+
+
+        .category:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .category-title {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .1em;
+
+            font-weight: 750;
+
+            color: #6b7688;
+
+            margin-bottom: 10px;
+        }
+
+
+        .category-icon {
+            width: 26px;
+            height: 26px;
+
+            border-radius: 7px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--blue-soft);
+
+            font-size: 13px;
+        }
+
+
+        .problem-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 9px;
+        }
+
+
+        .problem {
+            width: 100%;
+
+            min-height: 62px;
+
+            text-align: left;
+
+            background: var(--surface-2);
+
+            border: 1px solid var(--border);
+
+            border-radius: 11px;
+
+            padding: 11px 13px;
+
+            cursor: pointer;
+
+            transition:
+                transform .12s ease,
+                border-color .12s ease,
+                background .12s ease,
+                box-shadow .12s ease;
+
+            color: var(--text);
+        }
+
+
+        .problem:hover {
+            transform: translateY(-1px);
+
+            border-color: #aebbd0;
+
+            box-shadow:
+                0 5px 12px rgba(16,26,43,.06);
+        }
+
+
+        .problem.selected {
+            background: var(--blue-soft);
+
+            border-color: var(--blue);
+
+            box-shadow:
+                0 0 0 2px rgba(37,99,235,.08);
+        }
+
+
+        .problem-top {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 10px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .problem-name {
+            font-size: 12px;
+
+            font-weight: 650;
+
+            line-height: 1.35;
+        }
+
+
+        .check {
+            width: 18px;
+            height: 18px;
+
+            flex: 0 0 18px;
+
+            border-radius: 5px;
+
+            border: 1.5px solid #c3ccda;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 11px;
+
+            color: transparent;
+        }
+
+
+        .problem.selected .check {
+            background: var(--blue);
+
+            border-color: var(--blue);
+
+            color: white;
+        }
+
+
+        .problem-hint {
+            color: var(--muted);
+
+            font-size: 10px;
+
+            line-height: 1.4;
+        }
+
+
+        /* =========================================================
+           ANALYZE BUTTON
+        ========================================================= */
+
+        .analyze-area {
+            padding: 18px 20px;
+
+            border-top: 1px solid var(--border);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+        }
+
+
+        .selection-info {
+            font-size: 11px;
+
+            color: var(--muted);
+        }
+
+
+        .selection-info strong {
+            color: var(--text);
+        }
+
+
+        .analyze {
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            padding: 12px 20px;
+
+            border-radius: 9px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 15px rgba(37,99,235,.22);
+
+            transition:
+                transform .12s ease,
+                opacity .12s ease;
+        }
+
+
+        .analyze:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+
+        .analyze:disabled {
+            opacity: .45;
+
+            cursor: not-allowed;
+
+            box-shadow: none;
+        }
+
+
+        .clear {
+            border: none;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+            text-decoration: underline;
+
+            text-underline-offset: 3px;
+        }
+
+
+        /* =========================================================
+           SIDE INFORMATION
+        ========================================================= */
+
+        .info-stack {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 15px;
+        }
+
+
+        .info-card {
+            padding: 20px;
+        }
+
+
+        .info-heading {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .info-icon {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 9px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: var(--green-soft);
+
+            color: var(--green);
+
+            font-size: 16px;
+        }
+
+
+        .info-heading h3 {
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .info-heading p {
+            font-size: 10px;
+
+            color: var(--muted);
+
+            margin-top: 2px;
+        }
+
+
+        .flow {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 0;
+        }
+
+
+        .flow-item {
+            display: flex;
+
+            gap: 10px;
+
+            align-items: flex-start;
+
+            padding-bottom: 14px;
+
+            position: relative;
+        }
+
+
+        .flow-item:not(:last-child)::after {
+            content: "";
+
+            position: absolute;
+
+            left: 10px;
+
+            top: 23px;
+
+            width: 1px;
+
+            height: calc(100% - 8px);
+
+            background: var(--border);
+        }
+
+
+        .flow-number {
+            width: 21px;
+            height: 21px;
+
+            flex: 0 0 21px;
+
+            border-radius: 50%;
+
+            background: var(--blue-soft);
+
+            color: var(--blue);
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 9px;
+
+            font-weight: 750;
+
+            position: relative;
+
+            z-index: 1;
+        }
+
+
+        .flow-text strong {
+            display: block;
+
+            font-size: 11px;
+
+            margin-bottom: 2px;
+        }
+
+
+        .flow-text span {
+            display: block;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            line-height: 1.45;
+        }
+
+
+        .notice {
+            background: var(--orange-soft);
+
+            border: 1px solid #f1d9af;
+
+            color: #76501a;
+
+            font-size: 10.5px;
+
+            line-height: 1.55;
+
+            padding: 13px;
+
+            border-radius: 9px;
+        }
+
+
+        /* =========================================================
+           RESULTS
+        ========================================================= */
+
+        #results {
+            display: none;
+
+            margin-top: 24px;
+        }
+
+
+        #results.show {
+            display: block;
+
+            animation:
+                slideUp .3s ease;
+        }
+
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        .result-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 14px;
+        }
+
+
+        .result-heading h2 {
+            font-size: 19px;
+
+            font-weight: 750;
+
+            letter-spacing: -.02em;
+        }
+
+
+        .result-heading p {
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 3px;
+        }
+
+
+        .result-badge {
+            background: var(--green-soft);
+
+            color: var(--green);
+
+            border: 1px solid #c9eddf;
+
+            padding: 7px 10px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+        }
+
+
+        .result-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, .85fr)
+                minmax(0, 1.15fr);
+
+            gap: 18px;
+        }
+
+
+        /* Diagnosis */
+
+        .diagnosis-panel {
+            padding: 22px;
+        }
+
+
+        .panel-label {
+            color: var(--muted);
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .13em;
+
+            font-weight: 750;
+
+            margin-bottom: 12px;
+        }
+
+
+        .diagnosis {
+            border: 1px solid #bfe7d7;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f6fffb,
+                    #ffffff
+                );
+
+            border-radius: 12px;
+
+            padding: 17px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .diagnosis:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .diagnosis-tag {
+            display: inline-block;
+
+            color: var(--green);
+
+            font-size: 9px;
+
+            font-weight: 750;
+
+            text-transform: uppercase;
+
+            letter-spacing: .1em;
+
+            margin-bottom: 6px;
+        }
+
+
+        .diagnosis-title {
+            font-size: 17px;
+
+            font-weight: 750;
+
+            line-height: 1.3;
+        }
+
+
+        .no-result {
+            border: 1px dashed var(--border);
+
+            background: var(--surface-2);
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+
+        /* Intermediate */
+
+        .intermediate-box {
+            margin-top: 15px;
+
+            background: var(--blue-soft);
+
+            border: 1px solid #d3e0ff;
+
+            padding: 13px;
+
+            border-radius: 10px;
+        }
+
+
+        .intermediate-title {
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: .1em;
+
+            font-weight: 750;
+
+            color: var(--blue);
+
+            margin-bottom: 6px;
+        }
+
+
+        .intermediate-item {
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 10px;
+
+            color: #34518c;
+
+            margin-top: 4px;
+        }
+
+
+        /* =========================================================
+           REASONING
+        ========================================================= */
+
+        .reasoning-panel {
+            padding: 22px;
+        }
+
+
+        .reasoning-list {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 0;
+        }
+
+
+        .reason-step {
+            display: grid;
+
+            grid-template-columns: 32px 1fr;
+
+            gap: 10px;
+
+            position: relative;
+
+            padding-bottom: 18px;
+        }
+
+
+        .reason-step:last-child {
+            padding-bottom: 0;
+        }
+
+
+        .reason-step:not(:last-child)::after {
+            content: "";
+
+            position: absolute;
+
+            left: 15px;
+
+            top: 31px;
+
+            height: calc(100% - 17px);
+
+            width: 2px;
+
+            background: #e1e6ee;
+        }
+
+
+        .reason-number {
+            width: 31px;
+            height: 31px;
+
+            border-radius: 9px;
+
+            background: var(--navy);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 10px;
+
+            font-weight: 750;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+
+        .reason-content {
+            padding-top: 1px;
+        }
+
+
+        .rule-name {
+            color: var(--blue);
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            letter-spacing: .08em;
+
+            text-transform: uppercase;
+
+            margin-bottom: 5px;
+        }
+
+
+        .reason-flow {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            align-items: center;
+
+            gap: 6px;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        .fact {
+            background: #f2f5f9;
+
+            border: 1px solid #e0e5ed;
+
+            padding: 4px 7px;
+
+            border-radius: 5px;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 9px;
+        }
+
+
+        .arrow {
+            color: var(--blue);
+
+            font-weight: 700;
+        }
+
+
+        .conclusion {
+            background: var(--green-soft);
+
+            border: 1px solid #c9eddf;
+
+            color: #087552;
+
+            padding: 4px 7px;
+
+            border-radius: 5px;
+
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                monospace;
+
+            font-size: 9px;
+
+            font-weight: 700;
+        }
+
+
+        .explanation {
+            color: var(--muted);
+
+            font-size: 10px;
+
+            line-height: 1.5;
+
+            margin-top: 6px;
+        }
+
+
+        /* =========================================================
+           FOOTER
+        ========================================================= */
+
+        footer {
+            margin-top: 30px;
+
+            text-align: center;
+
+            color: #8791a0;
+
+            font-size: 10px;
+
+            padding: 20px 0;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 1000px) {
+
+            .app {
+                grid-template-columns: 210px 1fr;
+            }
+
+            .main {
+                padding: 24px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-stack {
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        @media (max-width: 720px) {
+
+            .app {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+
+                height: auto;
+
+                padding: 15px 18px;
+            }
+
+            .brand {
+                border-bottom: none;
+
+                padding-bottom: 0;
+            }
+
+            .nav,
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .main {
+                padding: 18px 14px 35px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .top-status {
+                display: none;
+            }
+
+            .hero {
+                padding: 25px 21px;
+            }
+
+            .problem-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .analyze-area {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .analyze {
+                width: 100%;
+            }
+
+            .clear {
+                align-self: center;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🖥
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    PC Diagnostic AI
+                </div>
+
+                <div class="brand-sub">
+                    Rule-Based Expert System
+                </div>
+            </div>
+
+        </div>
+
+
+        <nav class="nav">
+
+            <div class="nav-title">
+                System
+            </div>
+
+            <div class="nav-item active">
+
+                <span class="nav-icon">⌕</span>
+
+                <span>
+                    Troubleshooter
+                </span>
+
+            </div>
+
+
+            <div class="nav-item">
+
+                <span class="nav-icon">⚙</span>
+
+                <span>
+                    Rule Engine
+                </span>
+
+            </div>
+
+
+            <div class="nav-item">
+
+                <span class="nav-icon">↳</span>
+
+                <span>
+                    Forward Chaining
+                </span>
+
+            </div>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                Inference engine ready
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+
+    <main class="main">
+
+        <div class="main-inner">
+
+
+            <!-- TOP BAR -->
+
+            <div class="topbar">
+
+                <div class="page-title">
+
+                    <h1>
+                        Troubleshooting Dashboard
+                    </h1>
+
+                    <p>
+                        Analyze common PC and laptop problems using programmed rules.
+                    </p>
+
+                </div>
+
+
+                <div class="top-status">
+
+                    <span class="status-dot"></span>
+
+                    System Ready
+
+                </div>
+
+            </div>
+
+
+            <!-- HERO -->
+
+            <section class="hero">
+
+                <div class="hero-content">
+
+                    <div class="hero-label">
+                        ✦ AI Diagnostic Assistant
+                    </div>
+
+                    <h2>
+                        What's wrong with your computer?
+                    </h2>
+
+                    <p>
+                        Select all problems that describe your computer.
+                        The rule engine will process the selected facts,
+                        apply IF–THEN rules, and show exactly how it reached
+                        the troubleshooting result.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- MAIN DASHBOARD -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- =================================================
+                     PROBLEM SELECTION
+                ================================================== -->
+
+                <section class="card problem-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+                                Report a Problem
+                            </div>
+
+                            <div class="card-subtitle">
+                                Select one or more symptoms
+                            </div>
+
+                        </div>
+
+                        <div
+                            id="selectedCount"
+                            class="card-subtitle">
+                            0 selected
+                        </div>
+
+                    </div>
+
+
+                    <div class="problem-content">
+
+
+                        <!-- POWER -->
+
+                        <div class="category">
+
+                            <div class="category-title">
+
+                                <span class="category-icon">
+                                    ⚡
+                                </span>
+
+                                Power
+
+                            </div>
+
+
+                            <div class="problem-grid">
+
+                                {% for key, label in symptoms.items() %}
+
+                                    {% if key in [
+                                        "laptop_not_turning_on",
+                                        "charger_connected",
+                                        "charging_light_off",
+                                        "battery_drains_quickly"
+                                    ] %}
+
+                                        <button
+                                            class="problem"
+                                            type="button"
+                                            data-key="{{ key }}"
+                                            data-category="power">
+
+                                            <div class="problem-top">
+
+                                                <span class="problem-name">
+                                                    {{ label }}
+                                                </span>
+
+                                                <span class="check">
+                                                    ✓
+                                                </span>
+
+                                            </div>
+
+                                            <span class="problem-hint">
+                                                Power or battery related
+                                            </span>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DISPLAY -->
+
+                        <div class="category">
+
+                            <div class="category-title">
+
+                                <span class="category-icon">
+                                    ◫
+                                </span>
+
+                                Display
+
+                            </div>
+
+
+                            <div class="problem-grid">
+
+                                {% for key, label in symptoms.items() %}
+
+                                    {% if key in [
+                                        "screen_black",
+                                        "laptop_turns_on",
+                                        "fans_running",
+                                        "external_monitor_works"
+                                    ] %}
+
+                                        <button
+                                            class="problem"
+                                            type="button"
+                                            data-key="{{ key }}"
+                                            data-category="display">
+
+                                            <div class="problem-top">
+
+                                                <span class="problem-name">
+                                                    {{ label }}
+                                                </span>
+
+                                                <span class="check">
+                                                    ✓
+                                                </span>
+
+                                            </div>
+
+                                            <span class="problem-hint">
+                                                Screen or display related
+                                            </span>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PERFORMANCE -->
+
+                        <div class="category">
+
+                            <div class="category-title">
+
+                                <span class="category-icon">
+                                    ◒
+                                </span>
+
+                                Performance & Storage
+
+                            </div>
+
+
+                            <div class="problem-grid">
+
+                                {% for key, label in symptoms.items() %}
+
+                                    {% if key in [
+                                        "laptop_gets_hot",
+                                        "fan_noise_high",
+                                        "laptop_slow",
+                                        "many_background_apps",
+                                        "disk_usage_high",
+                                        "storage_almost_full"
+                                    ] %}
+
+                                        <button
+                                            class="problem"
+                                            type="button"
+                                            data-key="{{ key }}"
+                                            data-category="performance">
+
+                                            <div class="problem-top">
+
+                                                <span class="problem-name">
+                                                    {{ label }}
+                                                </span>
+
+                                                <span class="check">
+                                                    ✓
+                                                </span>
+
+                                            </div>
+
+                                            <span class="problem-hint">
+                                                Speed, heat or storage
+                                            </span>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- NETWORK -->
+
+                        <div class="category">
+
+                            <div class="category-title">
+
+                                <span class="category-icon">
+                                    ◉
+                                </span>
+
+                                Network
+
+                            </div>
+
+
+                            <div class="problem-grid">
+
+                                {% for key, label in symptoms.items() %}
+
+                                    {% if key in [
+                                        "wifi_not_working",
+                                        "other_devices_have_wifi"
+                                    ] %}
+
+                                        <button
+                                            class="problem"
+                                            type="button"
+                                            data-key="{{ key }}"
+                                            data-category="network">
+
+                                            <div class="problem-top">
+
+                                                <span class="problem-name">
+                                                    {{ label }}
+                                                </span>
+
+                                                <span class="check">
+                                                    ✓
+                                                </span>
+
+                                            </div>
+
+                                            <span class="problem-hint">
+                                                Internet or Wi-Fi related
+                                            </span>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- INPUT -->
+
+                        <div class="category">
+
+                            <div class="category-title">
+
+                                <span class="category-icon">
+                                    ⌨
+                                </span>
+
+                                Keyboard & Input
+
+                            </div>
+
+
+                            <div class="problem-grid">
+
+                                {% for key, label in symptoms.items() %}
+
+                                    {% if key in [
+                                        "keyboard_not_working",
+                                        "external_keyboard_works"
+                                    ] %}
+
+                                        <button
+                                            class="problem"
+                                            type="button"
+                                            data-key="{{ key }}"
+                                            data-category="input">
+
+                                            <div class="problem-top">
+
+                                                <span class="problem-name">
+                                                    {{ label }}
+                                                </span>
+
+                                                <span class="check">
+                                                    ✓
+                                                </span>
+
+                                            </div>
+
+                                            <span class="problem-hint">
+                                                Input device related
+                                            </span>
+
+                                        </button>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- ANALYZE -->
+
+                    <div class="analyze-area">
+
+                        <div>
+
+                            <div class="selection-info">
+                                Selected problems:
+                                <strong id="selectionText">
+                                    none
+                                </strong>
+                            </div>
+
+                            <button
+                                class="clear"
+                                id="clear">
+                                Clear selection
+                            </button>
+
+                        </div>
+
+
+                        <button
+                            class="analyze"
+                            id="run"
+                            disabled>
+
+                            🔍 Analyze My PC
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT INFORMATION PANEL
+                ================================================== -->
+
+                <div class="info-stack">
+
+
+                    <!-- HOW IT WORKS -->
+
+                    <section class="card info-card">
+
+                        <div class="info-heading">
+
+                            <div class="info-icon">
+                                ↳
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    How the AI works
+                                </h3>
+
+                                <p>
+                                    Forward-chaining reasoning
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="flow">
+
+
+                            <div class="flow-item">
+
+                                <div class="flow-number">
+                                    1
+                                </div>
+
+                                <div class="flow-text">
+
+                                    <strong>
+                                        User facts
+                                    </strong>
+
+                                    <span>
+                                        Your selected problems become initial facts.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="flow-item">
+
+                                <div class="flow-number">
+                                    2
+                                </div>
+
+                                <div class="flow-text">
+
+                                    <strong>
+                                        IF–THEN rules
+                                    </strong>
+
+                                    <span>
+                                        The engine checks which rules are satisfied.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="flow-item">
+
+                                <div class="flow-number">
+                                    3
+                                </div>
+
+                                <div class="flow-text">
+
+                                    <strong>
+                                        New facts
+                                    </strong>
+
+                                    <span>
+                                        Intermediate findings can trigger more rules.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="flow-item">
+
+                                <div class="flow-number">
+                                    4
+                                </div>
+
+                                <div class="flow-text">
+
+                                    <strong>
+                                        Result
+                                    </strong>
+
+                                    <span>
+                                        The system displays matching conclusions.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- NOTICE -->
+
+                    <div class="notice">
+
+                        <strong>Important:</strong>
+
+                        This is an educational rule-based troubleshooting
+                        system. Results are based only on the rules programmed
+                        into the knowledge base and should not be treated as
+                        professional hardware diagnosis.
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 RESULTS
+            ====================================================== -->
+
+            <section id="results">
+
+
+                <div class="result-header">
+
+                    <div class="result-heading">
+
+                        <h2>
+                            Diagnostic Result
+                        </h2>
+
+                        <p>
+                            Generated from the selected facts and rules
+                        </p>
+
+                    </div>
+
+
+                    <div class="result-badge">
+                        ✓ ANALYSIS COMPLETE
+                    </div>
+
+                </div>
+
+
+                <div class="result-grid">
+
+
+                    <!-- DIAGNOSIS -->
+
+                    <section class="card diagnosis-panel">
+
+                        <div class="panel-label">
+                            Possible issue
+                        </div>
+
+                        <div id="diagnoses"></div>
+
+
+                        <div
+                            id="intermediateBox"
+                            class="intermediate-box"
+                            style="display:none;">
+
+                            <div class="intermediate-title">
+                                Intermediate findings
+                            </div>
+
+                            <div id="intermediates">
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- REASONING -->
+
+                    <section class="card reasoning-panel">
+
+                        <div class="panel-label">
+                            How the system reasoned
+                        </div>
+
+                        <div
+                            id="path"
+                            class="reasoning-list">
+                        </div>
+
+                    </section>
+
+
+                </div>
+
+            </section>
+
+
+            <footer>
+
+                PC DIAGNOSTIC AI · RULE-BASED EXPERT SYSTEM ·
+                EDUCATIONAL PROJECT
+
+            </footer>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+
+    /* =============================================================
+       STATE
+    ============================================================= */
+
+    const selected = new Set();
+
+    const problemButtons =
+        document.querySelectorAll(".problem");
+
+    const runButton =
+        document.getElementById("run");
+
+    const clearButton =
+        document.getElementById("clear");
+
+    const selectedCount =
+        document.getElementById("selectedCount");
+
+    const selectionText =
+        document.getElementById("selectionText");
+
+    const results =
+        document.getElementById("results");
+
+
+    /* =============================================================
+       UPDATE SELECTION UI
+    ============================================================= */
+
+    function updateSelectionUI() {
+
+        const count = selected.size;
+
+        selectedCount.textContent =
+            count + (count === 1 ? " selected" : " selected");
+
+
+        runButton.disabled =
+            count === 0;
+
+
+        if (count === 0) {
+
+            selectionText.textContent =
+                "none";
+
+        } else {
+
+            selectionText.textContent =
+                count +
+                (count === 1 ? " problem" : " problems");
+
+        }
+
+    }
+
+
+    /* =============================================================
+       SELECT PROBLEM
+    ============================================================= */
+
+    problemButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const key =
+                button.dataset.key;
+
+
+            if (selected.has(key)) {
+
+                selected.delete(key);
+
+                button.classList.remove("selected");
+
+            } else {
+
+                selected.add(key);
+
+                button.classList.add("selected");
+
+            }
+
+
+            updateSelectionUI();
+
+        });
+
+    });
+
+
+    /* =============================================================
+       CLEAR
+    ============================================================= */
+
+    clearButton.addEventListener("click", () => {
+
+        selected.clear();
+
+
+        problemButtons.forEach(button => {
+
+            button.classList.remove("selected");
+
+        });
+
+
+        updateSelectionUI();
+
+
+        results.classList.remove("show");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    });
+
+
+    /* =============================================================
+       RUN INFERENCE
+    ============================================================= */
+
+    runButton.addEventListener("click", async () => {
+
+        if (selected.size === 0) {
+            return;
+        }
+
+
+        runButton.disabled = true;
+
+        runButton.textContent =
+            "Analyzing...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/diagnose",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            symptoms:
+                                [...selected]
+                        })
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Server error"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            renderResults(data);
+
+        }
+
+
+        catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Unable to run the diagnostic system. " +
+                "Please make sure the Flask server is running."
+            );
+
+        }
+
+
+        finally {
+
+            runButton.disabled =
+                selected.size === 0;
+
+            runButton.textContent =
+                "🔍 Analyze My PC";
+
+        }
+
+    });
+
+
+    /* =============================================================
+       RENDER RESULTS
+    ============================================================= */
+
+    function renderResults(data) {
+
+
+        /* ---------------------------------------------------------
+           DIAGNOSES
+        --------------------------------------------------------- */
+
+        const diagnosisElement =
+            document.getElementById("diagnoses");
+
+
+        if (data.diagnoses &&
+            data.diagnoses.length > 0) {
+
+
+            diagnosisElement.innerHTML =
+                data.diagnoses
+                    .map(d => {
+
+                        return `
+
+                            <div class="diagnosis">
+
+                                <div class="diagnosis-tag">
+                                    Possible Issue
+                                </div>
+
+                                <div class="diagnosis-title">
+                                    ${escapeHtml(d.label)}
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    })
+                    .join("");
+
+        }
+
+        else {
+
+            diagnosisElement.innerHTML = `
+
+                <div class="no-result">
+
+                    <strong>
+                        No matching troubleshooting conclusion
+                    </strong>
+
+                    <br><br>
+
+                    The selected problems did not satisfy
+                    any final rule in the knowledge base.
+
+                    Try selecting additional related problems.
+
+                </div>
+
+            `;
+
+        }
+
+
+        /* ---------------------------------------------------------
+           INTERMEDIATE FACTS
+        --------------------------------------------------------- */
+
+        const intermediateBox =
+            document.getElementById(
+                "intermediateBox"
+            );
+
+        const intermediateElement =
+            document.getElementById(
+                "intermediates"
+            );
+
+
+        if (
+            data.intermediates &&
+            data.intermediates.length > 0
+        ) {
+
+            intermediateBox.style.display =
+                "block";
+
+
+            intermediateElement.innerHTML =
+                data.intermediates
+                    .map(item => {
+
+                        return `
+
+                            <div class="intermediate-item">
+                                • ${escapeHtml(item.label)}
+                            </div>
+
+                        `;
+
+                    })
+                    .join("");
+
+        }
+
+        else {
+
+            intermediateBox.style.display =
+                "none";
+
+            intermediateElement.innerHTML =
+                "";
+
+        }
+
+
+        /* ---------------------------------------------------------
+           REASONING PATH
+        --------------------------------------------------------- */
+
+        const pathElement =
+            document.getElementById("path");
+
+
+        if (
+            data.steps &&
+            data.steps.length > 0
+        ) {
+
+
+            pathElement.innerHTML =
+                data.steps
+                    .map((step, index) => {
+
+
+                        const facts =
+                            step.triggered_by || [];
+
+
+                        const factsHtml =
+                            facts
+                                .map(fact => {
+
+                                    return `
+                                        <span class="fact">
+                                            ${escapeHtml(fact)}
+                                        </span>
+                                    `;
+
+                                })
+                                .join(
+                                    `<span class="arrow">+</span>`
+                                );
+
+
+                        const conclusion =
+                            step.conclusion_label ||
+                            step.conclusion;
+
+
+                        return `
+
+                            <div class="reason-step">
+
+                                <div class="reason-number">
+                                    ${index + 1}
+                                </div>
+
+
+                                <div class="reason-content">
+
+                                    <div class="rule-name">
+                                        Rule ${escapeHtml(step.rule)}
+                                    </div>
+
+
+                                    <div class="reason-flow">
+
+                                        ${factsHtml}
+
+                                        <span class="arrow">
+                                            →
+                                        </span>
+
+                                        <span class="conclusion">
+                                            ${escapeHtml(
+                                                conclusion
+                                            )}
+                                        </span>
+
+                                    </div>
+
+
+                                    ${
+                                        step.explanation
+                                        ?
+                                        `
+                                            <div class="explanation">
+                                                ${escapeHtml(
+                                                    step.explanation
+                                                )}
+                                            </div>
+                                        `
+                                        :
+                                        ""
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    })
+                    .join("");
+
+        }
+
+        else {
+
+            pathElement.innerHTML = `
+
+                <div class="no-result">
+
+                    No rules fired for the selected problems.
+
+                </div>
+
+            `;
+
+        }
+
+
+        /* ---------------------------------------------------------
+           SHOW RESULTS
+        --------------------------------------------------------- */
+
+        results.classList.add("show");
+
+
+        setTimeout(() => {
+
+            results.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }, 100);
+
+    }
+
+
+    /* =============================================================
+       HTML ESCAPE
+       Prevents returned text from being interpreted as HTML.
+    ============================================================= */
+
+    function escapeHtml(value) {
+
+        if (value === null ||
+            value === undefined) {
+
+            return "";
+
+        }
+
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* =============================================================
+       INITIAL STATE
+    ============================================================= */
+
+    updateSelectionUI();
+
+</script>
+
+
+</body>
+
+</html>
